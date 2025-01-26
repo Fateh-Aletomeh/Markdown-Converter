@@ -24,6 +24,11 @@ def parseInput() -> Optional[tuple[str]]:
     sys.exit(1)
 
 
+def addStyling() -> str:
+    with open("style.css", 'r') as file:
+        return "<style>" + file.read() + "</style>"
+
+
 def parseLine(line: str) -> Optional[Tag]:
     # Headers
     if re.search("^# ", line):
@@ -40,15 +45,18 @@ def main() -> None:
     input, output = parseInput()
     in_file = open(input, 'r')
     out_file = open(output, 'a')
-    out_file.write("<html>\n<header></header>\n<body>\n")
+    out_file.write(f"<html><head>{addStyling()}</head><body>")
 
-    for line in in_file.readlines():
+    line = in_file.readline()
+    while line:
         try:
             out_file.write(parseLine(line).html)
-        except TypeError:
-            continue
+        except AttributeError:
+            out_file.write(line.strip())
+        
+        line = in_file.readline()
 
-    out_file.write("</body>\n</html>")
+    out_file.write("</body></html>")
     out_file.close()
     in_file.close()
 
